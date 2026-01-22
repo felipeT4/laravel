@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class produto extends Model
+{
+    use HasFactory;
+    protected $fillable = [
+        'marca',
+        'descricao',
+        'valor_unitario',
+        'quantidade_estoque',
+        'faixa_etaria_minima',
+    ];
+}
