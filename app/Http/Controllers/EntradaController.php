@@ -3,34 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Models\entrada;
+use App\Models\produto;
 use Illuminate\Http\Request;
 
 class EntradaController extends Controller
 {
     public function store(Request $request){
-        $entrada = entrada::create([
-           'id_produto'=> $request -> id_produto,
-           'quantidade'=> $request -> quantidade
+    $produto = produto::find($request->id_produto);  
+    
+    if(!$produto){
+        return response()-> json(['message'=> 'Produto não encontrado']);
+    } else {
+        $entrada = Entrada::create([
+        'id_produto'=> $request-> id_produto,
+        'quantidade'=> $request-> quantidade
         ]);
-        return response()->json($entrada);
 
-          $produto = Pr::find($request ->id_produto);
-       if($produto == null) (
-        return response()->json('erro' => 'Tarefa não encontrada')
-       )
+    }
+
+    if(isset($entrada)){
+        $produto-> quantidade_estoque += $entrada->quantidade;
+    }
+    
+    $produto-> update();
+        return response()-> json($entrada);
         
-        $entrada = entrada::create([
-            'id_produto' => $request->id_produto;,
-            'quantidade' => $request->quantidade
-
-        ]);
-        iff(isset($request->quantidade))(
-            $produto->quantidade_estoque = $request-> quantidade + $produto-> quantidade_estoque;
-        )
-        $produto->update();
-        retrun response()->json($entrada)
-   
-
     }
     public function index(){
         $entrada = entrada::all();
@@ -39,18 +36,27 @@ class EntradaController extends Controller
     
       
 
-     public function delete($id) {
-        $entrada = entrada::find($id);
-        
-        if ($entrada == null) {
-            return response()-> json([
-                'erro' => 'entrada não encontrada'
-            ]);
-        }
-        $entrada->delete();
-        return response()-> json([
-            'mensagem' => 'excluido'
-        ]);
+   public function delete($id){
+        $entrada = Entrada::find($id);
 
+        if($entrada == null){
+            return response()-> json(['message'=> 'Produto não encontrado']);
+        }
+
+        $produto = $entrada-> id_produto;
+
+        $quantidade= $entrada-> quantidade;
+
+        $produto = Produto::find($produto);
+
+        if(isset($produto)){
+            $produto-> quantidade_estoque -= $quantidade;
+        }
+
+        $produto-> update();
+
+        $entrada-> delete($id);
+
+        return response()-> json(['Produto deletado']);
     }
 }
